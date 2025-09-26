@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dmsdb
+      MYSQL_USER: dmsuser
+      MYSQL_PASSWORD: dmspassword
+    ports:
+      - "3307:3306"   # Host 3307 -> Container 3306
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: .
+    container_name: newdms-backend
+    restart: always
+    ports:
+      - "8081:8080"   # Host 8081 -> Container 8080
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dmsdb
+      SPRING_DATASOURCE_USERNAME: dmsuser
+      SPRING_DATASOURCE_PASSWORD: dmspassword
+
+volumes:
+  mysql_data:
